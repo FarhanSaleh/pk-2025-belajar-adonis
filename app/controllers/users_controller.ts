@@ -1,5 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import User from '#models/users'
+import hash from '@adonisjs/core/services/hash'
 
 export default class UsersController {
   async index() {
@@ -15,10 +16,11 @@ export default class UsersController {
   }
   async store({ request, response }: HttpContext) {
     const data = request.only(['name', 'email', 'password'])
+    const hashedPassword = await hash.make(data.password)
     const user = await User.create({
       name: data.name,
       email: data.email,
-      password: data.password,
+      password: hashedPassword,
     })
     return response.created(user)
   }
